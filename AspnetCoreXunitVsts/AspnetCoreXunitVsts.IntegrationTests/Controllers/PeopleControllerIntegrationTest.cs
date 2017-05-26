@@ -87,6 +87,19 @@ namespace AspnetCoreXunitVsts.IntegrationTests.Controllers
             Assert.Equal(data.Name, person.Name);
         }
 
+        [Fact]
+        public async Task UpdatePerson()
+        {
+            var content = new StringContent("", Encoding.UTF8, "application/json");
+            var response = await Client.PutAsync($"{BaseUrl}/999", content);
+            response.EnsureSuccessStatusCode();
+
+            var dataString = await response.Content.ReadAsStringAsync();
+            var data = JsonConvert.DeserializeObject<Person>(dataString);
+
+            Assert.Equal(data.Name, "rafael");
+        }
+
         private async Task<Person> CreatePerson()
         {
             var person = new Person

@@ -49,5 +49,25 @@ namespace AspnetCoreXunitVsts.Api.Controllers
 
             return StatusCode((int)HttpStatusCode.Created, person);
         }
+
+        [HttpPut, Route("{id}")]
+        public async Task<IActionResult> UpdatePerson(int id, [FromBody]Person person)
+        {
+            var dbPerson = await _context.People.FirstOrDefaultAsync(p => p.Id == id);
+            if (dbPerson == null)
+            {
+                return NotFound();
+            }
+
+            if (!ModelState.IsValid)
+            {
+                return BadRequest(ModelState);
+            }
+
+            dbPerson.Name = person.Name;
+            await _context.SaveChangesAsync();
+
+            return Ok(dbPerson);
+        }
     }
 }
