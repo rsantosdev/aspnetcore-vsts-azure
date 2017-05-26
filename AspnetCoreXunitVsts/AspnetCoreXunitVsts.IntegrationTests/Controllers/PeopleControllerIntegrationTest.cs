@@ -88,16 +88,12 @@ namespace AspnetCoreXunitVsts.IntegrationTests.Controllers
         }
 
         [Fact]
-        public async Task UpdatePerson()
+        public async Task UpdatePersonShouldReturnNotFound()
         {
             var content = new StringContent("", Encoding.UTF8, "application/json");
             var response = await Client.PutAsync($"{BaseUrl}/999", content);
-            response.EnsureSuccessStatusCode();
 
-            var dataString = await response.Content.ReadAsStringAsync();
-            var data = JsonConvert.DeserializeObject<Person>(dataString);
-
-            Assert.Equal(data.Name, "rafael");
+            Assert.Equal(response.StatusCode, HttpStatusCode.NotFound);
         }
 
         private async Task<Person> CreatePerson()
