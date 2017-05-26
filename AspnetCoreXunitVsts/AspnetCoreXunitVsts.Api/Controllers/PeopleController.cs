@@ -65,6 +65,7 @@ namespace AspnetCoreXunitVsts.Api.Controllers
             }
 
             dbPerson.Name = person.Name;
+            _context.People.Update(dbPerson);
             await _context.SaveChangesAsync();
 
             return Ok(dbPerson);

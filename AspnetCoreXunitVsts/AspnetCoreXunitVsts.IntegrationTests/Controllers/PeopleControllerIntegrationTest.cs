@@ -2,10 +2,12 @@
 using System.Collections.Generic;
 using System.Net;
 using System.Net.Http;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 using AspnetCoreXunitVsts.Api.Models;
 using AspnetCoreXunitVsts.IntegrationTests.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Newtonsoft.Json;
 using Xunit;
 
@@ -94,6 +96,24 @@ namespace AspnetCoreXunitVsts.IntegrationTests.Controllers
             var response = await Client.PutAsync($"{BaseUrl}/999", content);
 
             Assert.Equal(response.StatusCode, HttpStatusCode.NotFound);
+        }
+
+        [Fact]
+        public async Task UpdatePersonShouldReturnOk()
+        {
+            var person = await CreatePerson();
+
+            var data = new { name = "Rafael Updated" };
+            var content = new StringContent(JsonConvert.SerializeObject(data), Encoding.UTF8, "application/json");
+            var response = await Client.PutAsync($"{BaseUrl}/{person.Id}", content);
+            response.EnsureSuccessStatusCode();
+
+            await TestDbContext.Entry(person)
+                               .ReloadAsync();
+
+            var dbPerson = await TestDbContext.People.FirstOrDefaultAsync(p => p.Id == person.Id);
+            Assert.Equal(response.StatusCode, HttpStatusCode.OK);
+            Assert.Equal(dbPerson.Name, data.name);
         }
 
         private async Task<Person> CreatePerson()
